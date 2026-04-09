@@ -39,8 +39,6 @@ export class KanbanDialogComponent implements OnInit {
 
         response => {
           console.log(response)
-          this.dialogRef.close();
-          window.location.reload();
         }
       )
     }
