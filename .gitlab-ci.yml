@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 stages:
   - build
   - deploy
@@ -21,4 +22,29 @@ Pull_image_deploy_container:
     - docker pull $CI_REGISTRY_IMAGE:latest
     - docker compose up -d --force-recreate frontend
   only:
+=======
+stages:
+  - build
+  - deploy
+
+Build_kanban-frontend_image_and_push:
+  stage: build
+  tags: 
+    - dima
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - develop
+
+Pull_image_deploy_container:
+  stage: deploy
+  tags: 
+    - dima
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:latest
+    - docker compose up -d --force-recreate frontend
+  only:
+>>>>>>> 32cd91546655ff96dc62377f5090225b6088c7da
     - develop
