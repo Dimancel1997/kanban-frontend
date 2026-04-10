@@ -4,19 +4,16 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm config set cache /tmp/npm-cache && \
-    npm ci --ignore-scripts --no-audit --no-fund
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
-RUN npm run build -- --configuration=production --build-optimizer --output-hashing=none
+RUN npm run build -- --configuration=production
 
 FROM nginx:1.25-alpine
 
 COPY default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/kanban-ui/ /usr/share/nginx/html/
-
-RUN rm -rf /usr/share/nginx/html/*.md /usr/share/nginx/html/50x.html
 
 EXPOSE 80
 
