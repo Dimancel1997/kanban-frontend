@@ -48,7 +48,7 @@ services:
   kanban-frontend:
     image: dmitryvasileva/kanban-frontend:latest
     ports:
-      - "8082:80"
+      - "8081:80"
     networks:
       - app-network
     healthcheck:
