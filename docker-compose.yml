@@ -1,0 +1,58 @@
+networks:
+  app-network:
+    external: true
+    name: kanban_network
+
+volumes:
+  kanban_data:
+    external: true
+
+services:
+  kanban-postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: kanban
+      POSTGRES_USER: kanban
+      POSTGRES_PASSWORD: kanban
+    volumes: 
+      - kanban_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:  
+      - app-network
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U kanban -d kanban"]
+      interval: 10s 
+      timeout: 5s
+      retries: 5  
+
+  kanban-app:
+    image: dmitryvasileva/kanban-app:latest 
+    ports: 
+      - "8081:8080"
+    depends_on:
+      kanban-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://kanban-postgres:5432/kanban
+      SPRING_DATASOURCE_USERNAME: kanban 
+      SPRING_DATASOURCE_PASSWORD: kanban
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kanban-frontend:
+    image: dmitryvasileva/kanban-frontend:latest
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
